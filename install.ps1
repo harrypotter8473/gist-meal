@@ -114,12 +114,15 @@ Say "`n--- 카카오톡 알림 (선택) ---" Cyan
 $UseKakao = switch ($Kakao) { "yes" { $true } "no" { $false } default { AskYesNo "카카오톡 '나에게 보내기'로도 받을까요? (카카오 개발자 앱 설정 필요, README 참고)" $false } }
 $KakaoOk = $false
 if ($UseKakao) {
+    Say "REST API 키와 시크릿 위치: 앱 → 플랫폼 키 → REST API 키"
+    Say "Client Secret은 카카오 로그인용 코드를 입력하세요. 비즈니스 인증 코드는 사용하지 않습니다."
+    Say "카카오 로그인 시크릿이 ON이면 필수입니다. 새 키는 기본적으로 ON이므로 콘솔에서 확인하세요."
     if (-not $KakaoKey) { $KakaoKey = Ask "REST API 키" "" }
-    if (-not $KakaoSecret -and -not $NonInteractive) { $KakaoSecret = Read-Host "Client Secret (사용하지 않으면 그냥 Enter)" }
+    if (-not $KakaoSecret -and -not $NonInteractive) { $KakaoSecret = Read-Host "카카오 로그인 Client Secret (OFF일 때만 Enter)" }
     if ([string]::IsNullOrWhiteSpace($KakaoKey)) {
         Say "[건너뜀] REST API 키가 없어 카카오톡 설정을 건너뜁니다. 나중에 install.cmd를 다시 실행하면 됩니다." Yellow
     } else {
-        Say "브라우저가 열리면 카카오 로그인 후 '동의하고 계속하기'를 누르세요."
+        Say "브라우저가 열리면 카카오 로그인 후 '카카오톡 메시지 전송'에 체크하고 '동의하고 계속하기'를 누르세요."
         $authArgs = @("$Root\.claude\skills\gist-meal\scripts\kakao_send.py", "auth", "--key", $KakaoKey)
         if ($KakaoSecret) { $authArgs += @("--secret", $KakaoSecret) }
         & $PythonExe @authArgs
@@ -130,8 +133,8 @@ if ($UseKakao) {
         if ($KakaoOk) { Say "[완료] 카카오톡 테스트 메시지를 보냈습니다. '나와의 채팅'을 확인하세요." Green }
         else { Say "[실패] 카카오톡 인증/전송에 실패했습니다. README의 카카오 설정을 확인한 뒤 install.cmd를 다시 실행하세요. (메모장 알림은 정상 설치됩니다)" Yellow }
     }
-} elseif (Test-Path "$Root\.secrets\kakao.json") {
-    # 이전에 인증해 둔 경우: 묻지 않고 유지할지 결정
+} elseif ($Kakao -eq "ask" -and (Test-Path "$Root\.secrets\kakao.json")) {
+    # yes/no를 명시하지 않았을 때만 기존 인증을 재사용한다. -Kakao no는 우선한다.
     $KakaoOk = AskYesNo "이전에 인증한 카카오톡 정보가 있습니다. 계속 카톡으로 받을까요?" $true
 }
 
