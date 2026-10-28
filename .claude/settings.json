@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python .claude/skills/gist-meal/scripts/fetch_menu.py*)",
+      "Bash(python .claude/skills/gist-meal/scripts/show_menu.py*)",
+      "WebFetch(domain:www.gist.ac.kr)"
+    ]
+  }
+}

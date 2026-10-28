@@ -1,0 +1,9 @@
+# 개인 정보·실행 결과 — 배포하지 않는다
+.secrets/
+config.cmd
+_workspace/
+_workspace_*/
+output/
+logs/
+.claude/settings.local.json
+__pycache__/
